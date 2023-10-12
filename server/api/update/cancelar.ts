@@ -1,0 +1,56 @@
+export default defineEventHandler(async (event) => {
+	try {
+		const {user} = event.context
+		const {id} = JSON.parse(await readBody(event)) as {
+			id: string
+		}
+		if (['Administrador', 'Gerente'].includes(user.level)) {
+			const reserva = await editarReserva(id, 'Cancelado', user.idcbpf, user.level, user.coord)
+			new Log({
+				usuario: user.idcbpf,
+				acao: `Cancelou a reserva ${id}`
+			}).save()
+			await enviarEmail(
+				'Cancelado',
+				[user.idcbpf, reserva.solicitadoPor],
+				reserva.audNome,
+				reserva.audCoord,
+				reserva.nomeEvento,
+				reserva.tipoEvento,
+				reserva.instResponsavel,
+				reserva.nomeResponsavel,
+				reserva.emailResponsavel,
+				reserva.telefoneResponsavel,
+				reserva.datas,
+				reserva.recursosAud,
+				reserva.descricao,
+				reserva.observacao
+			)
+			return ''
+		}
+		throw {
+			statusCode: 403,
+			statusMessage: 'Proibido',
+			message: 'Nao autorizado'
+		}
+	} catch (e) {
+		if (e && typeof e === 'string')
+			throw createError({statusCode: 500, message: e, statusMessage: 'Erro no servidor'})
+		if (e && typeof e === 'object' && 'statusCode' in e && 'message' in e && 'statusMessage' in e)
+			if (
+				typeof e.statusCode === 'number' &&
+				typeof e.message === 'string' &&
+				typeof e.statusMessage === 'string'
+			)
+				throw createError({
+					statusCode: e.statusCode,
+					message: e.message,
+					statusMessage: e.statusMessage
+				})
+		throw createError({
+			statusCode: 500,
+			message: 'Ocorreu um erro desconhecido',
+			statusMessage: 'Erro no servidor'
+		})
+	}
+})
