@@ -1,21 +1,19 @@
-import {ldapClient} from './ldapClient'
-import {Erro} from './mongoose'
-const {LDAP_PEOPLE_DN} = useRuntimeConfig().public
+const { LDAP_PEOPLE_DN } = useRuntimeConfig()
 
 export default (uid: string): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
 		let passwords: string[] = []
 		ldapClient.search(
 			`uid=${uid}, ${LDAP_PEOPLE_DN}`,
-			{attributes: ['userPassword']},
+			{ attributes: ['userPassword'] },
 			(err, res) => {
 				if (err) {
 					new Erro({
 						erro: {
 							info: 'Erro ao buscar senhas do usuario no Ldap',
 							uid,
-							err
-						}
+							err,
+						},
 					}).save()
 					return reject('Erro ao baixar senhas do usuário')
 				}
@@ -27,15 +25,15 @@ export default (uid: string): Promise<string[]> => {
 						erro: {
 							info: 'Erro ao buscar senhas do usuario no Ldap',
 							uid,
-							error
-						}
+							error,
+						},
 					}).save()
 					return reject('Erro ao baixar senhas do usuário')
 				})
 				res.on('end', () => {
 					return resolve(passwords)
 				})
-			}
+			},
 		)
 	})
 }

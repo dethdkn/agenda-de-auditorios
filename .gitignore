@@ -17,6 +17,7 @@ logs
 .DS_Store
 .fleet
 .idea
+.gitlab-ci.yml
 
 # Local env files
 .env
@@ -25,3 +26,4 @@ logs
 
 #local upload files
 static
+

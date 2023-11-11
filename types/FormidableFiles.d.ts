@@ -1,7 +1,7 @@
-import type {Files} from 'formidable'
+import type { Files } from 'formidable'
 
 declare global {
 	type FormidableFiles = Files
 }
 
-export {FormidableFiles}
+export { FormidableFiles }

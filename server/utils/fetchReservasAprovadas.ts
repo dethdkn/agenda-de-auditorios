@@ -1,20 +1,19 @@
-import {Reserva, Erro} from './mongoose'
-
 export default (): Promise<Reserva[]> => {
 	return new Promise(async (resolve, reject) => {
 		const reservas = await Reserva.find(
-			{status: 'Aprovado'},
-			{observacao: 0, aceitoPor: 0, status: 0, _id: 0, __v: 0}
+			{ status: 'Aprovado' },
+			{ observacao: 0, aceitoPor: 0, status: 0, _id: 0, __v: 0 },
 		).catch((err) => {
 			new Erro({
 				erro: {
 					info: 'Não foi possivel ler as reservas aprovadas do banco de dados',
-					err
-				}
+					err,
+				},
 			}).save()
 			return reject('Erro ao baixar reservas')
 		})
-		if (reservas) return resolve(reservas)
+		if (reservas)
+			return resolve(reservas)
 		return reject('Erro ao baixar reservas')
 	})
 }

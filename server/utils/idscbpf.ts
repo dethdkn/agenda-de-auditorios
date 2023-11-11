@@ -1,20 +1,18 @@
-import {ldapClient} from './ldapClient'
-import {Erro} from './mongoose'
-const {LDAP_PEOPLE_DN} = useRuntimeConfig().public
+const { LDAP_PEOPLE_DN } = useRuntimeConfig()
 
 export default (): Promise<string[]> => {
 	return new Promise(async (resolve, reject) => {
-		let users: string[] = []
+		const users: string[] = []
 		ldapClient.search(
 			LDAP_PEOPLE_DN,
-			{filter: '(uid=*)', scope: 'sub', attributes: ['uid']},
+			{ filter: '(uid=*)', scope: 'sub', attributes: ['uid'] },
 			(err, res) => {
 				if (err) {
 					new Erro({
 						erro: {
 							info: 'Erro na busca de idscbpf ldap',
-							err
-						}
+							err,
+						},
 					}).save()
 					return reject('Erro ao baixar usuários')
 				}
@@ -25,15 +23,15 @@ export default (): Promise<string[]> => {
 					new Erro({
 						erro: {
 							info: 'Erro na busca de idscbpf ldap',
-							error
-						}
+							error,
+						},
 					}).save()
 					return reject('Erro ao baixar usuários')
 				})
 				res.on('end', () => {
 					return resolve(users)
 				})
-			}
+			},
 		)
 	})
 }

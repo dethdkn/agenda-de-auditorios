@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const error = defineProps(['error'])
-const {statusCode, message} = error.error
+const { statusCode, message } = error.error
 useHead({
-	title: `Agenda de Auditórios - ${statusCode}`
+	title: `${statusCode}`,
 })
 </script>
 

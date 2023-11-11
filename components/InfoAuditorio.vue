@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const {auditorio} = defineProps({
+const { auditorio } = defineProps({
 	auditorio: {
 		type: Object as () => {
 			nome: string
@@ -11,31 +11,33 @@ const {auditorio} = defineProps({
 			fotos: string[]
 			planta?: string
 		},
-		required: true
-	}
+		required: true,
+	},
 })
-const {width} = useWindowSize()
+const { width } = useWindowSize()
 const currentSlide = ref(0)
 const fotosPrincipal = computed(() => {
 	const fotos = auditorio.fotos.map(
-		(foto) =>
-			`<img class="h-[calc(70vh-310px)] rounded-lg" src="/foto?f=${foto}" alt="Foto do Auditório ${auditorio.nome}">`
+		foto =>
+			`<img class="h-[calc(70vh-310px)] rounded-lg" src="/foto?f=${foto}" alt="Foto do Auditório ${auditorio.nome}">`,
 	)
-	if (auditorio.planta)
+	if (auditorio.planta) {
 		fotos.push(
-			`<img class="h-[calc(70vh-310px)] rounded-lg" src="/foto?f=${auditorio.planta}" alt="Planta do Auditório ${auditorio.nome}">`
+			`<img class="h-[calc(70vh-310px)] rounded-lg" src="/foto?f=${auditorio.planta}" alt="Planta do Auditório ${auditorio.nome}">`,
 		)
+	}
 	return fotos
 })
 const fotosSlide = computed(() => {
 	const fotos = auditorio.fotos.map(
-		(foto) =>
-			`<img class="max-w-xs rounded-lg cursor-move" src="/foto?f=${foto}" alt="Foto do Auditório ${auditorio.nome}">`
+		foto =>
+			`<img class="max-w-xs rounded-lg cursor-move" src="/foto?f=${foto}" alt="Foto do Auditório ${auditorio.nome}">`,
 	)
-	if (auditorio.planta)
+	if (auditorio.planta) {
 		fotos.push(
-			`<img class="max-w-xs rounded-lg cursor-move" src="/foto?f=${auditorio.planta}" alt="Planta do Auditório ${auditorio.nome}">`
+			`<img class="max-w-xs rounded-lg cursor-move" src="/foto?f=${auditorio.planta}" alt="Planta do Auditório ${auditorio.nome}">`,
 		)
+	}
 	return fotos
 })
 setInterval(() => {
@@ -50,9 +52,9 @@ setInterval(() => {
 			base: '',
 			ring: '',
 			divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-			header: {padding: 'px-4'},
+			header: { padding: 'px-4' },
 			rounded: '',
-			body: {padding: 'py-5'}
+			body: { padding: 'py-5' },
 		}"
 	>
 		<template #header>
@@ -81,16 +83,15 @@ setInterval(() => {
 			Nenhuma foto cadastrada neste auditório
 		</div>
 		<div v-else-if="width > 1350">
-			<Carousel :items-to-show="1" :wrap-around="false" v-model="currentSlide">
+			<Carousel v-model="currentSlide" :items-to-show="1" :wrap-around="false">
 				<Slide v-for="slide in fotosPrincipal" :key="slide">
 					<div class="carousel__item" v-html="slide" />
 				</Slide>
 			</Carousel>
 			<Carousel
+				v-model="currentSlide"
 				:items-to-show="4"
 				:wrap-around="true"
-				v-model="currentSlide"
-				ref="carousel"
 				class="mt-5"
 			>
 				<Slide v-for="(slide, i) in fotosSlide" :key="slide">

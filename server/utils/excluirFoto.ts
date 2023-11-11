@@ -1,13 +1,11 @@
-import {Auditorio, Erro} from './mongoose'
-
 export default (id: string, index: string): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		const auditorio = await Auditorio.findById(id).catch((err) => {
 			new Erro({
 				erro: {
 					info: 'Não foi possivel ler o auditório do banco de dados /api/delete/foto.ts',
-					err
-				}
+					err,
+				},
 			}).save()
 			return reject('Erro ao baixar auditório')
 		})
@@ -17,8 +15,8 @@ export default (id: string, index: string): Promise<void> => {
 				new Erro({
 					erro: {
 						info: 'Não foi possivel salvar o auditório após excluir a foto do auditorio',
-						err
-					}
+						err,
+					},
 				}).save()
 				return reject('Erro ao excluir foto')
 			})

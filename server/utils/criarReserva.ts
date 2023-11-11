@@ -1,5 +1,3 @@
-import {Reserva, Erro} from './mongoose'
-
 export default (
 	audNome: string,
 	audCoord: string,
@@ -9,16 +7,16 @@ export default (
 	nomeResponsavel: string,
 	emailResponsavel: string,
 	telefoneResponsavel: string,
-	datas: {data: Date; inicio: string; fim: string}[],
+	datas: { data: Date; inicio: string; fim: string }[],
 	recursosAud: string[],
 	solicitadoPor: string,
 	status: 'Aguardando' | 'Aprovado',
 	descricao?: string,
 	observacao?: string,
-	aceitoPor?: string
-): Promise<void> => {
+	aceitoPor?: string,
+): Promise<string> => {
 	return new Promise(async (resolve, reject) => {
-		await new Reserva({
+		const reserva = await new Reserva({
 			audNome,
 			audCoord,
 			nomeEvento,
@@ -33,18 +31,20 @@ export default (
 			status,
 			descricao,
 			observacao,
-			aceitoPor
+			aceitoPor,
 		})
 			.save()
 			.catch((err) => {
 				new Erro({
 					erro: {
 						info: 'Erro ao criar reserva',
-						err
-					}
+						err,
+					},
 				}).save()
 				return reject('Erro ao criar reserva')
 			})
-		resolve()
+		if (reserva)
+			resolve(reserva._id)
+		resolve('')
 	})
 }

@@ -3,11 +3,11 @@ definePageMeta({
 	middleware: 'is-authenticated',
 	pageTransition: {
 		name: 'slide-left',
-		mode: 'out-in'
-	}
+		mode: 'out-in',
+	},
 })
 useHead({
-	title: `Agenda de Auditórios - Reservas`
+	title: 'Reservas',
 })
 </script>
 

@@ -1,4 +1,5 @@
-import {createHash} from 'crypto'
+import { createHash } from 'node:crypto'
+import { Buffer } from 'node:buffer'
 
 export default (textPasswd: string, SSHAPasswd: string): string => {
 	const salt = Buffer.from(SSHAPasswd.slice(6), 'base64').slice(20)

@@ -1,22 +1,19 @@
-import {ldapClient} from './ldapClient'
-import {Erro} from './mongoose'
-import limparMembros from './limparMembros'
-const {LDAP_COORDINATIONS_DN} = useRuntimeConfig().public
+const { LDAP_COORDINATIONS_DN } = useRuntimeConfig()
 
 export default (cn: string): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
 		let members: string[] = []
 		ldapClient.search(
 			`cn=${cn}, ${LDAP_COORDINATIONS_DN}`,
-			{attributes: ['member']},
+			{ attributes: ['member'] },
 			(err, res) => {
 				if (err) {
 					new Erro({
 						erro: {
 							info: 'Erro na busca de membros de uma coordenação',
 							cn,
-							err
-						}
+							err,
+						},
 					}).save()
 					return reject('Erro ao baixar membros das coordenações')
 				}
@@ -28,15 +25,15 @@ export default (cn: string): Promise<string[]> => {
 						erro: {
 							info: 'Erro na busca de membros de uma coordenação',
 							cn,
-							error
-						}
+							error,
+						},
 					}).save()
 					return reject('Erro ao baixar membros das coordenações')
 				})
 				res.on('end', () => {
 					return resolve(limparMembros(members))
 				})
-			}
+			},
 		)
 	})
 }

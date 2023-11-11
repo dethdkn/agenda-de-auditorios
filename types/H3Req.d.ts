@@ -1,7 +1,7 @@
-import type {IncomingMessage} from 'http'
+import type { IncomingMessage } from 'node:http'
 
 declare global {
 	type H3Req = IncomingMessage
 }
 
-export {H3Req}
+export { H3Req }

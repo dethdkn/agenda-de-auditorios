@@ -1,19 +1,17 @@
-import {Reserva, Erro} from './mongoose'
-
 export default (
 	id: string,
 	status: 'Aguardando' | 'Aprovado' | 'Recusado' | 'Cancelado',
 	aceitoPor: string,
 	level: string,
-	coord: string[]
+	coord: string[],
 ): Promise<Reserva> => {
 	return new Promise(async (resolve, reject) => {
 		const reserva = await Reserva.findById(id).catch((err) => {
 			new Erro({
 				erro: {
 					info: 'Não foi possivel ler a Reserva',
-					err
-				}
+					err,
+				},
 			}).save()
 			return reject('Erro ao baixar reserva')
 		})
@@ -24,8 +22,8 @@ export default (
 				new Erro({
 					erro: {
 						info: 'Não foi possivel salvar a reserva após editar',
-						err
-					}
+						err,
+					},
 				}).save()
 				return reject('Erro ao editar reserva')
 			})

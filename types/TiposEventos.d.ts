@@ -4,4 +4,4 @@ declare global {
 	}
 }
 
-export {TiposEventos}
+export { TiposEventos }

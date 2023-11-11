@@ -1,10 +1,11 @@
 <script setup lang="ts">
-const {data, error, refresh, pending} = await useFetch('/api/fetch/auditorios')
+const { SITE_URL } = useRuntimeConfig().public
+const { data, error, refresh, pending } = await useFetch('/api/fetch/auditorios')
 if (error.value) {
 	const err = (error.value as any).data
 	if (err) {
-		const {statusCode, statusMessage, message} = err
-		throw createError({statusCode, statusMessage, message})
+		const { statusCode, statusMessage, message } = err
+		throw createError({ statusCode, statusMessage, message })
 	}
 }
 
@@ -12,43 +13,43 @@ const colunas = [
 	{
 		key: 'id',
 		label: 'ID',
-		sortable: false
+		sortable: false,
 	},
 	{
 		key: 'nome',
 		label: 'Nome',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'coordenacao',
 		label: 'Coordenação',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'capacidade',
 		label: 'Capacidade',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'url',
 		label: 'URL',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'itens',
 		label: 'Itens',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'descricao',
 		label: 'Descrição',
-		sortable: true
+		sortable: true,
 	},
 	{
 		key: 'acoes',
 		label: 'Ações',
-		sortable: false
-	}
+		sortable: false,
+	},
 ]
 const pesquisar = ref('')
 const audFiltro = computed(() => {
@@ -73,10 +74,10 @@ const descricaoNovo = ref('')
 const {
 	open: abrirPlantaNovo,
 	reset: resetPlantaNovo,
-	files: plantaNovo
-} = useFileDialog({accept: 'image/*'})
+	files: plantaNovo,
+} = useFileDialog({ accept: 'image/*' })
 watch(modalNovo, (nv) => {
-	if (!nv)
+	if (!nv) {
 		setTimeout(() => {
 			nomeNovo.value = ''
 			capacidadeNovo.value = ''
@@ -87,14 +88,15 @@ watch(modalNovo, (nv) => {
 			resetPlantaNovo()
 			loadingNovo.value = false
 		}, 300)
+	}
 })
-const criar = () => {
+async function criar() {
 	loadingNovo.value = true
 	if (!nomeNovo.value) {
 		useToast().add({
 			title: 'Preencha o Nome do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingNovo.value = false)
 	}
@@ -102,7 +104,7 @@ const criar = () => {
 		useToast().add({
 			title: 'Preencha a Capacidade do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingNovo.value = false)
 	}
@@ -110,7 +112,7 @@ const criar = () => {
 		useToast().add({
 			title: 'Selecione a Coordenação do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingNovo.value = false)
 	}
@@ -118,7 +120,7 @@ const criar = () => {
 		useToast().add({
 			title: 'Preencha a URL do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingNovo.value = false)
 	}
@@ -130,36 +132,26 @@ const criar = () => {
 	formData.append('itens', itensNovo.value)
 	formData.append('planta', plantaNovo.value && plantaNovo.value[0] ? plantaNovo.value[0] : '')
 	formData.append('descricao', descricaoNovo.value)
-	fetch('/api/insert/auditorio', {
+	const res = await $fetch('/api/insert/auditorio', {
 		method: 'POST',
-		body: formData
+		body: formData,
+	}).catch((err) => {
+		useToast().add({
+			title: err.data.message,
+			icon: 'i-heroicons-exclamation-triangle',
+			color: 'red',
+		})
+		modalNovo.value = false
 	})
-		.then(async (res) => {
-			if (res.ok) {
-				refresh()
-				modalNovo.value = false
-				return useToast().add({
-					title: 'Auditório criado com sucesso!',
-					icon: 'i-heroicons-check-badge',
-					color: 'green'
-				})
-			}
-			const err: ErroReq = await res.json()
-			useToast().add({
-				title: err.message,
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalNovo.value = false
+	if (res) {
+		refresh()
+		modalNovo.value = false
+		return useToast().add({
+			title: 'Auditório criado com sucesso!',
+			icon: 'i-heroicons-check-badge',
+			color: 'green',
 		})
-		.catch(() => {
-			useToast().add({
-				title: 'Ocorreu um erro desconhecido',
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalNovo.value = false
-		})
+	}
 }
 
 const modalEditar = ref(false)
@@ -175,10 +167,10 @@ const descricaoEditar = ref('')
 const {
 	open: abrirPlantaEditar,
 	reset: resetPlantaEditar,
-	files: plantaEditar
-} = useFileDialog({accept: 'image/*'})
+	files: plantaEditar,
+} = useFileDialog({ accept: 'image/*' })
 watch(modalEditar, (nv) => {
-	if (!nv)
+	if (!nv) {
 		setTimeout(() => {
 			nomeFixEditar.value = ''
 			idEditar.value = ''
@@ -191,25 +183,28 @@ watch(modalEditar, (nv) => {
 			resetPlantaEditar()
 			loadingEditar.value = false
 		}, 300)
+	}
 })
-const abrirEditar = (aud: Auditorio) => {
-	if (aud._id) idEditar.value = aud._id
+function abrirEditar(aud: Auditorio) {
+	if (aud._id)
+		idEditar.value = aud._id
 	nomeFixEditar.value = aud.nome
 	nomeEditar.value = aud.nome
 	capacidadeEditar.value = aud.capacidade.toString()
 	coordenacaoEditar.value = aud.coordenacao
 	urlEditar.value = aud.url
 	itensEditar.value = aud.itens.join(', ')
-	if (aud.descricao) descricaoEditar.value = aud.descricao
+	if (aud.descricao)
+		descricaoEditar.value = aud.descricao
 	modalEditar.value = true
 }
-const editar = () => {
+async function editar() {
 	loadingEditar.value = true
 	if (!nomeEditar.value) {
 		useToast().add({
 			title: 'Preencha o Nome do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingEditar.value = false)
 	}
@@ -217,7 +212,7 @@ const editar = () => {
 		useToast().add({
 			title: 'Preencha a Capacidade do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingEditar.value = false)
 	}
@@ -225,7 +220,7 @@ const editar = () => {
 		useToast().add({
 			title: 'Selecione a Coordenação do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingEditar.value = false)
 	}
@@ -233,7 +228,7 @@ const editar = () => {
 		useToast().add({
 			title: 'Preencha a URL do Auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		return (loadingEditar.value = false)
 	}
@@ -246,39 +241,29 @@ const editar = () => {
 	formData.append('itens', itensEditar.value)
 	formData.append(
 		'planta',
-		plantaEditar.value && plantaEditar.value[0] ? plantaEditar.value[0] : ''
+		plantaEditar.value && plantaEditar.value[0] ? plantaEditar.value[0] : '',
 	)
 	formData.append('descricao', descricaoEditar.value)
-	fetch('/api/update/auditorio', {
+	const res = await $fetch('/api/update/auditorio', {
 		method: 'POST',
-		body: formData
+		body: formData,
+	}).catch((err) => {
+		useToast().add({
+			title: err.data.message,
+			icon: 'i-heroicons-exclamation-triangle',
+			color: 'red',
+		})
+		modalEditar.value = false
 	})
-		.then(async (res) => {
-			if (res.ok) {
-				refresh()
-				modalEditar.value = false
-				return useToast().add({
-					title: 'Auditório editado com sucesso!',
-					icon: 'i-heroicons-check-badge',
-					color: 'green'
-				})
-			}
-			const err: ErroReq = await res.json()
-			useToast().add({
-				title: err.message,
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalEditar.value = false
+	if (res) {
+		refresh()
+		modalEditar.value = false
+		return useToast().add({
+			title: 'Auditório editado com sucesso!',
+			icon: 'i-heroicons-check-badge',
+			color: 'green',
 		})
-		.catch(() => {
-			useToast().add({
-				title: 'Ocorreu um erro desconhecido',
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalEditar.value = false
-		})
+	}
 }
 
 const modalExcluir = ref(false)
@@ -286,53 +271,45 @@ const loadingExcluir = ref(false)
 const idExcluir = ref('')
 const nomeExcluir = ref('')
 watch(modalExcluir, (nv) => {
-	if (!nv)
+	if (!nv) {
 		setTimeout(() => {
 			idExcluir.value = ''
 			nomeExcluir.value = ''
 			loadingExcluir.value = false
 		}, 300)
+	}
 })
-const abrirExcluir = (nome: string, id?: string) => {
-	if (id) idExcluir.value = id
+function abrirExcluir(nome: string, id?: string) {
+	if (id)
+		idExcluir.value = id
 	nomeExcluir.value = nome
 	modalExcluir.value = true
 }
-const excluir = () => {
+async function excluir() {
 	loadingExcluir.value = true
-	fetch('/api/delete/auditorio', {
+	const res = await $fetch('/api/delete/auditorio', {
 		method: 'POST',
-		body: JSON.stringify({
+		body: {
 			id: idExcluir.value,
-			nome: nomeExcluir.value
+			nome: nomeExcluir.value,
+		},
+	}).catch((err) => {
+		useToast().add({
+			title: err.data.message,
+			icon: 'i-heroicons-exclamation-triangle',
+			color: 'red',
 		})
+		modalExcluir.value = false
 	})
-		.then(async (res) => {
-			if (res.ok) {
-				refresh()
-				modalExcluir.value = false
-				return useToast().add({
-					title: 'Auditório excluído com sucesso!',
-					icon: 'i-heroicons-check-badge',
-					color: 'green'
-				})
-			}
-			const err: ErroReq = await res.json()
-			useToast().add({
-				title: err.message,
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalExcluir.value = false
+	if (res) {
+		refresh()
+		modalExcluir.value = false
+		return useToast().add({
+			title: 'Auditório excluído com sucesso!',
+			icon: 'i-heroicons-check-badge',
+			color: 'green',
 		})
-		.catch(() => {
-			useToast().add({
-				title: 'Ocorreu um erro desconhecido',
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalExcluir.value = false
-		})
+	}
 }
 
 const modalFotos = ref(false)
@@ -343,145 +320,119 @@ const fotos = ref<string[]>([])
 const {
 	open: abrirFileFotos,
 	reset: resetFileFotos,
-	onChange: uploadFileFotos
-} = useFileDialog({accept: 'image/*', multiple: true})
+	onChange: uploadFileFotos,
+} = useFileDialog({ accept: 'image/*', multiple: true })
 watch(modalFotos, (nv) => {
-	if (!nv)
+	if (!nv) {
 		setTimeout(() => {
 			idFotos.value = ''
 			fotos.value = []
 			resetFileFotos()
 			loadingFotos.value = false
 		}, 300)
+	}
 })
-const abrirFotos = (nome: string, id?: string) => {
+function abrirFotos(nome: string, id?: string) {
 	nomeFotos.value = nome
-	if (id) idFotos.value = id
+	if (id)
+		idFotos.value = id
 	getFotos()
 	modalFotos.value = true
 }
-const getFotos = () => {
+function getFotos() {
 	if (data.value) {
-		const auditorioAtual = data.value.find((obj) => obj._id === idFotos.value)
-		if (auditorioAtual) fotos.value = auditorioAtual.fotos
+		const auditorioAtual = data.value.find(obj => obj._id === idFotos.value)
+		if (auditorioAtual)
+			fotos.value = auditorioAtual.fotos
 	}
 }
-uploadFileFotos((fotos) => {
+uploadFileFotos(async (fotos) => {
 	loadingFotos.value = true
 	if (fotos) {
 		const formData = new FormData()
 		formData.append('id', idFotos.value)
-		for (const file of fotos) {
+		for (const file of fotos)
 			formData.append('foto', file)
-		}
-		fetch('/api/insert/fotos', {
+
+		const res = await $fetch('/api/insert/fotos', {
 			method: 'POST',
-			body: formData
+			body: formData,
+		}).catch((err) => {
+			useToast().add({
+				title: err.data.message,
+				icon: 'i-heroicons-exclamation-triangle',
+				color: 'red',
+			})
+			modalFotos.value = false
 		})
-			.then(async (res) => {
-				if (res.ok) {
-					await refresh()
-					getFotos()
-					loadingFotos.value = false
-					return useToast().add({
-						title: 'Foto(s) enviada(s) com sucesso!',
-						icon: 'i-heroicons-check-badge',
-						color: 'green'
-					})
-				}
-				const err: ErroReq = await res.json()
-				useToast().add({
-					title: err.message,
-					icon: 'i-heroicons-exclamation-triangle',
-					color: 'red'
-				})
-				modalFotos.value = false
+		if (res) {
+			await refresh()
+			getFotos()
+			loadingFotos.value = false
+			return useToast().add({
+				title: 'Foto(s) enviada(s) com sucesso!',
+				icon: 'i-heroicons-check-badge',
+				color: 'green',
 			})
-			.catch(() => {
-				useToast().add({
-					title: 'Ocorreu um erro desconhecido',
-					icon: 'i-heroicons-exclamation-triangle',
-					color: 'red'
-				})
-				modalFotos.value = false
-			})
-	} else {
+		}
+	}
+	else {
 		loadingFotos.value = false
 	}
 })
-const principal = (index: number) => {
+async function principal(index: number) {
 	loadingFotos.value = true
-	fetch('/api/update/foto', {
+	const res = await $fetch('/api/update/foto', {
 		method: 'POST',
-		body: JSON.stringify({
+		body: {
 			id: idFotos.value,
-			index: index.toString()
+			index: index.toString(),
+		},
+	}).catch((err) => {
+		useToast().add({
+			title: err.data.message,
+			icon: 'i-heroicons-exclamation-triangle',
+			color: 'red',
 		})
+		modalFotos.value = false
 	})
-		.then(async (res) => {
-			if (res.ok) {
-				await refresh()
-				getFotos()
-				loadingFotos.value = false
-				return useToast().add({
-					title: 'Foto Principal atualizada com sucesso!',
-					icon: 'i-heroicons-check-badge',
-					color: 'green'
-				})
-			}
-			const err: ErroReq = await res.json()
-			useToast().add({
-				title: err.message,
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalFotos.value = false
+	if (res) {
+		await refresh()
+		getFotos()
+		loadingFotos.value = false
+		return useToast().add({
+			title: 'Foto Principal atualizada com sucesso!',
+			icon: 'i-heroicons-check-badge',
+			color: 'green',
 		})
-		.catch(() => {
-			useToast().add({
-				title: 'Ocorreu um erro desconhecido',
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalFotos.value = false
-		})
+	}
 }
-const deletarFoto = (index: number) => {
+async function deletarFoto(index: number) {
 	loadingFotos.value = true
-	fetch('/api/delete/foto', {
+	const res = await $fetch('/api/delete/foto', {
 		method: 'POST',
-		body: JSON.stringify({
+		body: {
 			id: idFotos.value,
-			index: index.toString()
+			index: index.toString(),
+		},
+	}).catch((err) => {
+		useToast().add({
+			title: err.data.message,
+			icon: 'i-heroicons-exclamation-triangle',
+			color: 'red',
 		})
+		modalFotos.value = false
 	})
-		.then(async (res) => {
-			if (res.ok) {
-				await refresh()
-				getFotos()
-				loadingFotos.value = false
-				return useToast().add({
-					title: 'Foto excluída com sucesso!',
-					icon: 'i-heroicons-check-badge',
-					color: 'green'
-				})
-			}
-			const err: ErroReq = await res.json()
-			useToast().add({
-				title: err.message,
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalFotos.value = false
+	if (res) {
+		await refresh()
+		getFotos()
+		loadingFotos.value = false
+		return useToast().add({
+			title: 'Foto excluída com sucesso!',
+			icon: 'i-heroicons-check-badge',
+			color: 'green',
 		})
-		.catch(() => {
-			useToast().add({
-				title: 'Ocorreu um erro desconhecido',
-				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
-			})
-			modalFotos.value = false
-		})
+	}
 }
 </script>
 
@@ -492,10 +443,10 @@ const deletarFoto = (index: number) => {
 			base: '',
 			ring: '',
 			divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-			header: {padding: 'px-4 py-5'},
+			header: { padding: 'px-4 py-5' },
 			rounded: '',
-			body: {padding: '', base: 'divide-y divide-gray-200 dark:divide-gray-700'},
-			footer: {padding: 'p-4'}
+			body: { padding: '', base: 'divide-y divide-gray-200 dark:divide-gray-700' },
+			footer: { padding: 'p-4' },
 		}"
 	>
 		<div class="flex items-center justify-between px-4 py-3 gap-3">
@@ -518,80 +469,80 @@ const deletarFoto = (index: number) => {
 			:rows="audFiltro"
 			:columns="colunas"
 			:loading="pending"
-			:loading-state="{icon: 'i-heroicons-arrow-path-20-solid', label: 'Carregando...'}"
+			:loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Carregando...' }"
 			:empty-state="{
 				icon: 'i-heroicons-circle-stack-20-solid',
-				label: 'Nenhum auditório encontrado.'
+				label: 'Nenhum auditório encontrado.',
 			}"
 			sort-asc-icon="i-heroicons-arrow-up"
 			sort-desc-icon="i-heroicons-arrow-down"
 		>
-			<template #id-data="{row}">
-				<UTooltip :text="row._id" :popper="{placement: 'top'}" class="cursor-context-menu">
+			<template #id-data="{ row }">
+				<UTooltip :text="row._id" :popper="{ placement: 'top' }" class="cursor-context-menu">
 					<UIcon name="i-heroicons-eye" />
 				</UTooltip>
 			</template>
-			<template #coordenacao-data="{row}">
+			<template #coordenacao-data="{ row }">
 				<UBadge size="xs" :label="row.coordenacao" variant="subtle" />
 			</template>
-			<template #capacidade-data="{row}">
+			<template #capacidade-data="{ row }">
 				<UBadge size="xs" :label="row.capacidade" color="teal" variant="outline" />
 			</template>
-			<template #url-data="{row}">
+			<template #url-data="{ row }">
 				<UBadge size="xs" :label="row.url" color="indigo" variant="subtle" />
 			</template>
-			<template #itens-data="{row}">
+			<template #itens-data="{ row }">
 				<UTooltip
 					:text="row.itens.join(', ')"
-					:popper="{placement: 'top'}"
+					:popper="{ placement: 'top' }"
 					class="cursor-context-menu"
 				>
 					<UIcon name="i-heroicons-eye" />
 				</UTooltip>
 			</template>
-			<template #descricao-data="{row}">
-				<UTooltip :text="row.descricao" :popper="{placement: 'top'}" class="cursor-context-menu">
+			<template #descricao-data="{ row }">
+				<UTooltip :text="row.descricao" :popper="{ placement: 'top' }" class="cursor-context-menu">
 					<UIcon name="i-heroicons-eye" />
 				</UTooltip>
 			</template>
-			<template #acoes-data="{row}">
+			<template #acoes-data="{ row }">
 				<div class="flex space-x-2">
-					<UTooltip text="Ver Auditório" :popper="{placement: 'top'}">
+					<UTooltip text="Ver Auditório" :popper="{ placement: 'top' }">
 						<UButton
 							icon="i-heroicons-arrow-top-right-on-square"
 							size="2xs"
 							color="emerald"
 							variant="soft"
-							:ui="{rounded: 'rounded-full'}"
-							@click="navigateTo('/auditorio/' + row.url)"
+							:ui="{ rounded: 'rounded-full' }"
+							@click="navigateTo(`/auditorio/${row.url}`)"
 						/>
 					</UTooltip>
-					<UTooltip text="Editar Auditório" :popper="{placement: 'top'}">
+					<UTooltip text="Editar Auditório" :popper="{ placement: 'top' }">
 						<UButton
 							icon="i-heroicons-pencil-square"
 							size="2xs"
 							variant="soft"
-							:ui="{rounded: 'rounded-full'}"
+							:ui="{ rounded: 'rounded-full' }"
 							@click="abrirEditar(row)"
 						/>
 					</UTooltip>
-					<UTooltip text="Editar Imagens" :popper="{placement: 'top'}">
+					<UTooltip text="Editar Imagens" :popper="{ placement: 'top' }">
 						<UButton
 							icon="i-heroicons-photo"
 							size="2xs"
 							color="indigo"
 							variant="soft"
-							:ui="{rounded: 'rounded-full'}"
+							:ui="{ rounded: 'rounded-full' }"
 							@click="abrirFotos(row.nome, row._id)"
 						/>
 					</UTooltip>
-					<UTooltip text="Excluir Auditório" :popper="{placement: 'top'}">
+					<UTooltip text="Excluir Auditório" :popper="{ placement: 'top' }">
 						<UButton
 							icon="i-heroicons-trash"
 							size="2xs"
 							color="red"
 							variant="soft"
-							:ui="{rounded: 'rounded-full'}"
+							:ui="{ rounded: 'rounded-full' }"
 							@click="abrirExcluir(row.nome, row._id)"
 						/>
 					</UTooltip>
@@ -604,11 +555,13 @@ const deletarFoto = (index: number) => {
 		<UCard
 			:ui="{
 				divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-				header: {background: 'bg-green-500'}
+				header: { background: 'bg-green-500' },
 			}"
 		>
 			<template #header>
-				<h3 class="text-center text-white">Novo Auditório</h3>
+				<h3 class="text-center text-white">
+					Novo Auditório
+				</h3>
 			</template>
 
 			<div class="grid grid-cols-2 gap-4 place-items-center">
@@ -616,24 +569,21 @@ const deletarFoto = (index: number) => {
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="nome-novo"
-						>Nome</label
-					>
+					>Nome</label>
 					<UInput id="nome-novo" v-model="nomeNovo" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="capacidade-novo"
-						>Capacidade</label
-					>
+					>Capacidade</label>
 					<UInput id="capacidade-novo" v-model="capacidadeNovo" @keydown="useIsNumber" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="coordenacao-novo"
-						>Coordenação</label
-					>
+					>Coordenação</label>
 					<USelectMenu
 						id="coordenacao-novo"
 						v-model="coordenacaoNovo"
@@ -643,25 +593,21 @@ const deletarFoto = (index: number) => {
 					/>
 				</div>
 				<div class="w-full">
-					<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="url-novo"
-						>URL</label
-					>
+					<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="url-novo">URL</label>
 					<UInput id="url-novo" v-model="urlNovo" @keydown.space.prevent />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="itens-novo"
-						>Itens (separados por vírgulas)</label
-					>
+					>Itens (separados por vírgulas)</label>
 					<UInput id="itens-novo" v-model="itensNovo" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="planta-novo"
-						>Planta</label
-					>
+					>Planta</label>
 					<UButton
 						id="planta-novo"
 						icon="i-heroicons-arrow-up-tray"
@@ -677,9 +623,8 @@ const deletarFoto = (index: number) => {
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="descricao-novo"
-						>Descrição</label
-					>
-					<UTextarea id="descricao-novo" autoresize v-model="descricaoNovo" />
+					>Descrição</label>
+					<UTextarea id="descricao-novo" v-model="descricaoNovo" autoresize />
 				</div>
 			</div>
 
@@ -689,15 +634,15 @@ const deletarFoto = (index: number) => {
 						label="Cancelar"
 						color="red"
 						icon="i-heroicons-no-symbol"
-						@click="modalNovo = false"
 						:disabled="loadingNovo"
+						@click="modalNovo = false"
 					/>
 					<UButton
 						label="Criar"
 						color="green"
 						icon="i-heroicons-check-circle"
-						@click="criar"
 						:loading="loadingNovo"
+						@click="criar"
 					/>
 				</div>
 			</template>
@@ -708,11 +653,13 @@ const deletarFoto = (index: number) => {
 		<UCard
 			:ui="{
 				divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-				header: {background: 'bg-blue-500'}
+				header: { background: 'bg-blue-500' },
 			}"
 		>
 			<template #header>
-				<h3 class="text-center text-white">Editar Auditório - {{ nomeFixEditar }}</h3>
+				<h3 class="text-center text-white">
+					Editar Auditório - {{ nomeFixEditar }}
+				</h3>
 			</template>
 
 			<div class="grid grid-cols-2 gap-4 place-items-center">
@@ -720,24 +667,21 @@ const deletarFoto = (index: number) => {
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="nome-editar"
-						>Nome</label
-					>
+					>Nome</label>
 					<UInput id="nome-editar" v-model="nomeEditar" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="capacidade-editar"
-						>Capacidade</label
-					>
+					>Capacidade</label>
 					<UInput id="capacidade-editar" v-model="capacidadeEditar" @keydown="useIsNumber" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="coordenacao-editar"
-						>Coordenação</label
-					>
+					>Coordenação</label>
 					<USelectMenu
 						id="coordenacao-editar"
 						v-model="coordenacaoEditar"
@@ -750,24 +694,21 @@ const deletarFoto = (index: number) => {
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="url-editar"
-						>URL</label
-					>
+					>URL</label>
 					<UInput id="url-editar" v-model="urlEditar" @keydown.space.prevent />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="itens-editar"
-						>Itens (separados por vírgulas)</label
-					>
+					>Itens (separados por vírgulas)</label>
 					<UInput id="itens-editar" v-model="itensEditar" />
 				</div>
 				<div class="w-full">
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="planta-editar"
-						>Planta</label
-					>
+					>Planta</label>
 					<UButton
 						id="planta-editar"
 						icon="i-heroicons-arrow-up-tray"
@@ -783,9 +724,8 @@ const deletarFoto = (index: number) => {
 					<label
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 						for="descricao-editar"
-						>Descrição</label
-					>
-					<UTextarea id="descricao-editar" autoresize v-model="descricaoEditar" />
+					>Descrição</label>
+					<UTextarea id="descricao-editar" v-model="descricaoEditar" autoresize />
 				</div>
 			</div>
 
@@ -795,35 +735,37 @@ const deletarFoto = (index: number) => {
 						label="Cancelar"
 						color="red"
 						icon="i-heroicons-no-symbol"
-						@click="modalEditar = false"
 						:disabled="loadingEditar"
+						@click="modalEditar = false"
 					/>
 					<UButton
 						label="Editar"
 						icon="i-heroicons-pencil-square"
-						@click="editar"
 						:loading="loadingEditar"
+						@click="editar"
 					/>
 				</div>
 			</template>
 		</UCard>
 	</UModal>
 
-	<UModal v-model="modalFotos" :ui="{width: 'w-4/5'}">
+	<UModal v-model="modalFotos" :ui="{ width: '!w-4/5 sm:max-w-full' }">
 		<UCard
 			:ui="{
 				divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-				header: {background: 'bg-cyan-500'}
+				header: { background: 'bg-cyan-500' },
 			}"
 		>
 			<template #header>
-				<h3 class="text-center text-white">Fotos Auditório - {{ nomeFotos }}</h3>
+				<h3 class="text-center text-white">
+					Fotos Auditório - {{ nomeFotos }}
+				</h3>
 			</template>
-			<div class="grid grid-cols-5 gap-4" v-if="fotos.length > 0">
-				<div class="relative inline-block" v-for="(foto, i) in fotos">
-					<img
+			<div v-if="fotos.length > 0" class="grid grid-cols-5 gap-4">
+				<div v-for="(foto, i) in fotos" :key="foto" class="relative inline-block">
+					<NuxtImg
 						class="rounded-md"
-						:src="`/foto?f=${foto}`"
+						:src="`${SITE_URL}/foto?f=${foto}`"
 						alt="'Fotos do auditório selecionado"
 						loading="lazy"
 					/>
@@ -834,7 +776,7 @@ const deletarFoto = (index: number) => {
 						color="emerald"
 						variant="soft"
 						:disabled="i === 0"
-						:ui="{rounded: 'rounded-full'}"
+						:ui="{ rounded: 'rounded-full' }"
 						@click="principal(i)"
 					/>
 					<UButton
@@ -843,29 +785,27 @@ const deletarFoto = (index: number) => {
 						size="2xs"
 						color="red"
 						variant="soft"
-						:ui="{rounded: 'rounded-full'}"
+						:ui="{ rounded: 'rounded-full' }"
 						@click="deletarFoto(i)"
 					/>
 				</div>
 			</div>
-			<span v-else class="block text-sm font-medium text-center text-gray-900 dark:text-white"
-				>nenhuma foto encontrada</span
-			>
+			<span v-else class="block text-sm font-medium text-center text-gray-900 dark:text-white">nenhuma foto encontrada</span>
 			<template #footer>
 				<div class="flex justify-center space-x-4">
 					<UButton
 						label="Fechar"
 						color="cyan"
 						icon="i-heroicons-x-circle"
-						@click="modalFotos = false"
 						:disabled="loadingFotos"
+						@click="modalFotos = false"
 					/>
 					<UButton
 						label="Enviar"
 						color="green"
 						icon="i-heroicons-arrow-up-tray"
-						@click="abrirFileFotos"
 						:loading="loadingFotos"
+						@click="abrirFileFotos"
 					/>
 				</div>
 			</template>
@@ -876,30 +816,30 @@ const deletarFoto = (index: number) => {
 		<UCard
 			:ui="{
 				divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-				header: {background: 'bg-red-500'}
+				header: { background: 'bg-red-500' },
 			}"
 		>
 			<template #header>
-				<h3 class="text-center text-white">Excluir Auditório - {{ nomeExcluir }}</h3>
+				<h3 class="text-center text-white">
+					Excluir Auditório - {{ nomeExcluir }}
+				</h3>
 			</template>
-			<span class="block text-sm font-medium text-center text-gray-900 dark:text-white"
-				>Tem certeza que deseja excluir este auditório?</span
-			>
+			<span class="block text-sm font-medium text-center text-gray-900 dark:text-white">Tem certeza que deseja excluir este auditório?</span>
 			<template #footer>
 				<div class="flex justify-center space-x-4">
 					<UButton
 						label="Cancelar"
 						color="green"
 						icon="i-heroicons-x-circle"
-						@click="modalExcluir = false"
 						:disabled="loadingExcluir"
+						@click="modalExcluir = false"
 					/>
 					<UButton
 						label="Excluir"
 						color="red"
 						icon="i-heroicons-trash"
-						@click="excluir"
 						:disabled="loadingExcluir"
+						@click="excluir"
 					/>
 				</div>
 			</template>

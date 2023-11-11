@@ -1,26 +1,26 @@
 <script setup lang="ts">
-const {data: auditorios, error} = await useFetch('/api/fetch/auditorios')
+const { data: auditorios, error } = await useFetch('/api/fetch/auditorios')
 if (error.value) {
 	const err = (error.value as any).data
 	if (err) {
-		const {statusCode, statusMessage, message} = err
-		throw createError({statusCode, statusMessage, message})
+		const { statusCode, statusMessage, message } = err
+		throw createError({ statusCode, statusMessage, message })
 	}
 }
-const {data: tiposEventos, error: error2} = await useFetch('/api/fetch/tiposeventos')
+const { data: tiposEventos, error: error2 } = await useFetch('/api/fetch/tiposeventos')
 if (error2.value) {
 	const err = (error2.value as any).data
 	if (err) {
-		const {statusCode, statusMessage, message} = err
-		throw createError({statusCode, statusMessage, message})
+		const { statusCode, statusMessage, message } = err
+		throw createError({ statusCode, statusMessage, message })
 	}
 }
-const {data: instituicoes, error: error3} = await useFetch('/api/fetch/instituicoes')
+const { data: instituicoes, error: error3 } = await useFetch('/api/fetch/instituicoes')
 if (error3.value) {
 	const err = (error3.value as any).data
 	if (err) {
-		const {statusCode, statusMessage, message} = err
-		throw createError({statusCode, statusMessage, message})
+		const { statusCode, statusMessage, message } = err
+		throw createError({ statusCode, statusMessage, message })
 	}
 }
 
@@ -57,12 +57,13 @@ const resultadoSemana = computed(() => {
 		for (let diaNumero = 0; diaNumero < 7; diaNumero++) {
 			if (diasSemana.value[diaNumero]) {
 				const datasSelecionas = semanaParaData(dataInicioSemana.value, diaNumero, repetir.value)
-				for (const dataSelecionada of datasSelecionas)
+				for (const dataSelecionada of datasSelecionas) {
 					resultado.push({
 						data: dataSelecionada,
 						inicio: horaInicioSemana.value[diaNumero],
-						fim: horaFimSemana.value[diaNumero]
+						fim: horaFimSemana.value[diaNumero],
 					})
+				}
 			}
 		}
 	}
@@ -77,7 +78,7 @@ const loading = ref(false)
 
 watch(slctAuditorio, async (novoNome) => {
 	if (auditorios.value) {
-		const audSelecionado = auditorios.value.find((obj) => obj.nome === novoNome)
+		const audSelecionado = auditorios.value.find(obj => obj.nome === novoNome)
 		if (audSelecionado) {
 			slctAuditorioURL.value = audSelecionado.url
 			coordResp.value = audSelecionado.coordenacao
@@ -88,84 +89,94 @@ watch(slctAuditorio, async (novoNome) => {
 	}
 })
 
-const removerData = () => {
-	if (quantidadeDatas.value > 1) quantidadeDatas.value -= 1
+function removerData() {
+	if (quantidadeDatas.value > 1)
+		quantidadeDatas.value -= 1
 }
 
-const solicitar = () => {
+async function solicitar() {
 	loading.value = true
 	if (!slctAuditorio.value) {
 		useToast().add({
 			title: 'Selecione um auditório',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!nomeEvento.value) {
+	}
+	else if (!nomeEvento.value) {
 		useToast().add({
 			title: 'Informe o nome do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!tipoEvento.value) {
+	}
+	else if (!tipoEvento.value) {
 		useToast().add({
 			title: 'Selecione o tipo do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!instResponsavel.value) {
+	}
+	else if (!instResponsavel.value) {
 		useToast().add({
 			title: 'Informe a instituição/coordenação responsável do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!nomeResponsavel.value) {
+	}
+	else if (!nomeResponsavel.value) {
 		useToast().add({
 			title: 'Informe o nome do responsável do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!emailResponsavel.value) {
+	}
+	else if (!emailResponsavel.value) {
 		useToast().add({
 			title: 'Informe o email do responsável do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!useValidateEmail(emailResponsavel.value)) {
+	}
+	else if (!useValidateEmail(emailResponsavel.value)) {
 		useToast().add({
 			title: 'Informe um email válido',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!telefoneResponsavel.value) {
+	}
+	else if (!telefoneResponsavel.value) {
 		useToast().add({
 			title: 'Informe o telefone do responsável do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else if (!descricao.value) {
+	}
+	else if (!descricao.value) {
 		useToast().add({
 			title: 'Informe a descrição do evento',
 			icon: 'i-heroicons-exclamation-circle',
-			color: 'amber'
+			color: 'amber',
 		})
 		loading.value = false
-	} else {
-		let datasHoras: {data: Date; inicio: string; fim: string}[] = []
+	}
+	else {
+		let datasHoras: { data: Date; inicio: string; fim: string }[] = []
 		if (tabSelecionada.value === 0) {
 			for (let i = 0; i < quantidadeDatas.value; i++) {
 				if (!datas.value[i] || !horaInicio.value[i] || !horaFim.value[i]) {
 					useToast().add({
 						title: `Informe a ${i + 1}ª data/horario do evento`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -176,7 +187,7 @@ const solicitar = () => {
 							i + 1
 						}ª data esta inválida (não é possivel criar uma solicitação para o passado)`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -187,7 +198,7 @@ const solicitar = () => {
 							i + 1
 						}ª data esta inválido (horario de inicio deve ocorrer antes do horario final)`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -195,16 +206,16 @@ const solicitar = () => {
 				for (let j = 0; j < quantidadeDatas.value; j++) {
 					if (i !== j && datas.value[i].getTime() === datas.value[j].getTime()) {
 						if (
-							(horaInicio.value[i] > horaInicio.value[j] &&
-								horaInicio.value[i] < horaFim.value[j]) ||
-							(horaFim.value[i] > horaInicio.value[j] && horaFim.value[i] < horaFim.value[j])
+							(horaInicio.value[i] > horaInicio.value[j]
+								&& horaInicio.value[i] < horaFim.value[j])
+							|| (horaFim.value[i] > horaInicio.value[j] && horaFim.value[i] < horaFim.value[j])
 						) {
 							useToast().add({
 								title: `O horario da ${i + 1}ª data esta em conflito com o horario da ${
 									j + 1
 								}ª data`,
 								icon: 'i-heroicons-exclamation-circle',
-								color: 'amber'
+								color: 'amber',
 							})
 							loading.value = false
 							return
@@ -212,15 +223,15 @@ const solicitar = () => {
 					}
 				}
 			}
-			for (let i = 0; i < quantidadeDatas.value; i++) {
-				datasHoras.push({data: datas.value[i], inicio: horaInicio.value[i], fim: horaFim.value[i]})
-			}
-		} else {
+			for (let i = 0; i < quantidadeDatas.value; i++)
+				datasHoras.push({ data: datas.value[i], inicio: horaInicio.value[i], fim: horaFim.value[i] })
+		}
+		else {
 			if (resultadoSemana.value.length < 1) {
 				useToast().add({
 					title: `Selecione pelo menos 1 data`,
 					icon: 'i-heroicons-exclamation-circle',
-					color: 'amber'
+					color: 'amber',
 				})
 				loading.value = false
 				return
@@ -230,7 +241,7 @@ const solicitar = () => {
 					useToast().add({
 						title: `Não é possivel criar uma solicitação para o passado`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -239,7 +250,7 @@ const solicitar = () => {
 					useToast().add({
 						title: `Selecione o horário de início`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -248,7 +259,7 @@ const solicitar = () => {
 					useToast().add({
 						title: `Selecione o horário final`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -257,7 +268,7 @@ const solicitar = () => {
 					useToast().add({
 						title: `Horário de início deve ocorrer antes do horario final`,
 						icon: 'i-heroicons-exclamation-circle',
-						color: 'amber'
+						color: 'amber',
 					})
 					loading.value = false
 					return
@@ -267,20 +278,22 @@ const solicitar = () => {
 		}
 		const recursosSolicitados: string[] = []
 		for (const [index, value] of recursos.value.entries()) {
-			if (value) recursosSolicitados.push(recursosDisponiveis.value[index])
+			if (value)
+				recursosSolicitados.push(recursosDisponiveis.value[index])
 		}
+
 		if (!checkSuporte.value) {
 			useToast().add({
 				title: `Confirme a informação da Equipe de Suporte ao final da Página`,
 				icon: 'i-heroicons-exclamation-triangle',
-				color: 'red'
+				color: 'red',
 			})
 			loading.value = false
 			return
 		}
-		fetch('/api/insert/reserva', {
+		const res = await $fetch('/api/insert/reserva', {
 			method: 'POST',
-			body: JSON.stringify({
+			body: {
 				urlAuditorio: slctAuditorioURL.value,
 				nomeEvento: nomeEvento.value,
 				tipoEvento: tipoEvento.value,
@@ -288,39 +301,28 @@ const solicitar = () => {
 				nomeResponsavel: nomeResponsavel.value,
 				emailResponsavel: emailResponsavel.value,
 				telefoneResponsavel: telefoneResponsavel.value,
-				datasHoras: datasHoras,
-				recursosSolicitados: recursosSolicitados,
+				datasHoras,
+				recursosSolicitados,
 				descricao: descricao.value,
-				observacao: observacao.value
+				observacao: observacao.value,
+			},
+		}).catch((err) => {
+			useToast().add({
+				title: err.data.message,
+				icon: 'i-heroicons-exclamation-triangle',
+				color: 'red',
 			})
+			loading.value = false
 		})
-			.then(async (res) => {
-				if (res.ok) {
-					const result = await res.text()
-					loading.value = false
-					return useToast().add({
-						title: result,
-						icon: 'i-heroicons-check-badge',
-						color: 'green',
-						timeout: 60000
-					})
-				}
-				const err: ErroReq = await res.json()
-				loading.value = false
-				useToast().add({
-					title: err.message,
-					icon: 'i-heroicons-exclamation-triangle',
-					color: 'red'
-				})
+		if (res) {
+			loading.value = false
+			return useToast().add({
+				title: res,
+				icon: 'i-heroicons-check-badge',
+				color: 'green',
+				timeout: 60000,
 			})
-			.catch(() => {
-				loading.value = false
-				useToast().add({
-					title: 'Ocorreu um erro desconhecido',
-					icon: 'i-heroicons-exclamation-triangle',
-					color: 'red'
-				})
-			})
+		}
 	}
 }
 </script>
@@ -333,8 +335,8 @@ const solicitar = () => {
 			ring: '',
 			divide: 'divide-y divide-gray-200 dark:divide-gray-700',
 			rounded: '',
-			header: {padding: 'px-4 py-5'},
-			footer: {padding: 'p-4'}
+			header: { padding: 'px-4 py-5' },
+			footer: { padding: 'p-4' },
 		}"
 	>
 		<template #header>
@@ -349,13 +351,12 @@ const solicitar = () => {
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="auditorio-solic"
-					>Auditório</label
-				>
+				>Auditório</label>
 				<USelectMenu
-					id="auditorio-solic"
-					icon="i-heroicons-tv"
-					v-model="slctAuditorio"
 					v-if="auditorios"
+					id="auditorio-solic"
+					v-model="slctAuditorio"
+					icon="i-heroicons-tv"
 					:options="auditorios"
 					value-attribute="nome"
 					option-attribute="nome"
@@ -367,33 +368,27 @@ const solicitar = () => {
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="coord-solic"
-					>Coordenação responsável pelo auditório</label
-				>
-				<UInput id="coord-solic" icon="i-heroicons-user-group" v-model="coordResp" disabled />
+				>Coordenação responsável pelo auditório</label>
+				<UInput id="coord-solic" v-model="coordResp" icon="i-heroicons-user-group" disabled />
 			</div>
 			<div class="w-full">
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="capacidade-solic"
-					>Capacidade máxima do auditório</label
-				>
-				<UInput id="capacidade-solic" icon="i-heroicons-users" v-model="capacidade" disabled />
+				>Capacidade máxima do auditório</label>
+				<UInput id="capacidade-solic" v-model="capacidade" icon="i-heroicons-users" disabled />
 			</div>
 			<div class="w-full">
-				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="nome-solic"
-					>Nome do Evento</label
-				>
-				<UInput id="nome-solic" icon="i-heroicons-bookmark" v-model="nomeEvento" />
+				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="nome-solic">Nome do Evento</label>
+				<UInput id="nome-solic" v-model="nomeEvento" icon="i-heroicons-bookmark" />
 			</div>
 			<div class="w-full">
-				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="tipo-solic"
-					>Tipo do Evento</label
-				>
+				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="tipo-solic">Tipo do Evento</label>
 				<USelectMenu
-					id="tipo-solic"
-					icon="i-heroicons-megaphone"
-					v-model="tipoEvento"
 					v-if="tiposEventos"
+					id="tipo-solic"
+					v-model="tipoEvento"
+					icon="i-heroicons-megaphone"
 					:options="tiposEventos"
 					value-attribute="nome"
 					option-attribute="nome"
@@ -402,14 +397,12 @@ const solicitar = () => {
 				/>
 			</div>
 			<div class="w-full">
-				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="inst-solic"
-					>Inst./Coord. responsável</label
-				>
+				<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="inst-solic">Inst./Coord. responsável</label>
 				<USelectMenu
-					id="inst-solic"
-					icon="i-heroicons-building-library"
-					v-model="instResponsavel"
 					v-if="instituicoes"
+					id="inst-solic"
+					v-model="instResponsavel"
+					icon="i-heroicons-building-library"
 					:options="instituicoes"
 					value-attribute="nome"
 					option-attribute="nome"
@@ -421,20 +414,18 @@ const solicitar = () => {
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="nome-resp-solic"
-					>Nome do Responsável</label
-				>
-				<UInput id="nome-resp-solic" icon="i-heroicons-user" v-model="nomeResponsavel" />
+				>Nome do Responsável</label>
+				<UInput id="nome-resp-solic" v-model="nomeResponsavel" icon="i-heroicons-user" />
 			</div>
 			<div class="w-full">
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="email-solic"
-					>Email do Responsável</label
-				>
+				>Email do Responsável</label>
 				<UInput
 					id="email-solic"
-					icon="i-heroicons-envelope"
 					v-model="emailResponsavel"
+					icon="i-heroicons-envelope"
 					@keydown.space.prevent
 				/>
 			</div>
@@ -442,28 +433,27 @@ const solicitar = () => {
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					for="telefone-solic"
-					>Telefone do Responsável</label
-				>
+				>Telefone do Responsável</label>
 				<UInput
 					id="telefone-solic"
-					icon="i-heroicons-phone"
 					v-model="telefoneResponsavel"
+					icon="i-heroicons-phone"
 					@keydown="useIsNumber"
 				/>
 			</div>
 			<div class="w-full col-span-1 sm:col-span-3 md:col-span-3 lg:col-span-2">
 				<UTabs
-					@change="changeTab"
 					:items="[
 						{
 							label: 'Agendar por Dia',
-							slot: 'dia'
+							slot: 'dia',
 						},
 						{
 							label: 'Agendar por Semana',
-							slot: 'semana'
-						}
+							slot: 'semana',
+						},
 					]"
+					@change="changeTab"
 				>
 					<template #dia>
 						<div class="flex justify-center mt-6 space-x-2">
@@ -487,11 +477,11 @@ const solicitar = () => {
 						<span
 							class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white"
 							for="data-solic"
-							>Data(s) do Evento</span
-						>
+						>Data(s) do Evento</span>
 						<div
-							class="mt-4 grid grid-cols-11 gap-4 place-items-center"
 							v-for="i in quantidadeDatas"
+							:key="i"
+							class="mt-4 grid grid-cols-11 gap-4 place-items-center"
 						>
 							<div class="w-full col-span-3">
 								<VDatePicker v-model="datas[i - 1]" />
@@ -502,8 +492,8 @@ const solicitar = () => {
 							<div class="w-full col-span-3">
 								<USelectMenu
 									id="inst-solic"
-									icon="i-heroicons-clock"
 									v-model="horaInicio[i - 1]"
+									icon="i-heroicons-clock"
 									:options="useHorasInicio"
 									searchable
 									searchable-placeholder="Pesquisar..."
@@ -515,8 +505,8 @@ const solicitar = () => {
 							<div class="w-full col-span-3">
 								<USelectMenu
 									id="inst-solic"
-									icon="i-heroicons-clock"
 									v-model="horaFim[i - 1]"
+									icon="i-heroicons-clock"
 									:options="useHorasFim"
 									searchable
 									searchable-placeholder="Pesquisar..."
@@ -528,15 +518,16 @@ const solicitar = () => {
 						<div class="mt-6 grid grid-cols-2 gap-4 place-items-center">
 							<div class="col-span-2 sm:col-span-1">
 								<div
-									class="mt-2 grid grid-cols-11 gap-4 place-items-center"
 									v-for="(dia, i) in useDiasSemana"
+									:key="dia"
+									class="mt-2 grid grid-cols-11 gap-4 place-items-center"
 								>
 									<div class="flex items-center justify-start w-full col-span-3">
 										<UToggle
+											v-model="diasSemana[i]"
 											on-icon="i-heroicons-check-20-solid"
 											off-icon="i-heroicons-x-mark-20-solid"
 											color="green"
-											v-model="diasSemana[i]"
 										/>
 										<span class="ms-2">{{ dia }}</span>
 									</div>
@@ -546,11 +537,11 @@ const solicitar = () => {
 									<div class="w-full col-span-3">
 										<USelectMenu
 											id="inst-solic"
+											v-model="horaInicioSemana[i]"
 											icon="i-heroicons-clock"
 											:options="useHorasInicio"
 											searchable
 											searchable-placeholder="Pesquisar..."
-											v-model="horaInicioSemana[i]"
 										/>
 									</div>
 									<div class="w-full text-center">
@@ -559,11 +550,11 @@ const solicitar = () => {
 									<div class="w-full col-span-3">
 										<USelectMenu
 											id="inst-solic"
+											v-model="horaFimSemana[i]"
 											icon="i-heroicons-clock"
 											:options="useHorasFim"
 											searchable
 											searchable-placeholder="Pesquisar..."
-											v-model="horaFimSemana[i]"
 										/>
 									</div>
 								</div>
@@ -576,15 +567,17 @@ const solicitar = () => {
 								<div class="w-full mt-6 text-center space-x-3">
 									<span class="inline-block">Repetir</span>
 									<UInput
-										:ui="{wrapper: 'w-10 inline-block'}"
-										@keydown="useIsNumber"
 										v-model="repetir"
+										:ui="{ wrapper: 'w-10 inline-block' }"
+										@keydown="useIsNumber"
 									/>
 									<span class="inline-block">Vez(es)</span>
 								</div>
 							</div>
 							<div>
-								<h3 v-if="resultadoSemana.length > 0" class="mb-5 text-center">Resultado:</h3>
+								<h3 v-if="resultadoSemana.length > 0" class="mb-5 text-center">
+									Resultado:
+								</h3>
 								<p
 									v-for="resultado in resultadoSemana"
 									:key="resultado.data.toLocaleDateString('pt-br')"
@@ -602,40 +595,36 @@ const solicitar = () => {
 				<span
 					class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white"
 					for="data-solic"
-					>Recursos do Auditório</span
-				>
-				<div
-					class="flex items-center justify-start md:ms-96 lg:ms-4"
-					v-if="recursosDisponiveis.length > 0"
-					v-for="(recursosD, i) in recursosDisponiveis"
-					:key="recursosD"
-				>
-					<UToggle
-						on-icon="i-heroicons-check-20-solid"
-						off-icon="i-heroicons-x-mark-20-solid"
-						color="green"
-						v-model="recursos[i]"
-					/>
-					<span class="ms-2">{{ recursosD }}</span>
+				>Recursos do Auditório</span>
+				<div v-if="recursosDisponiveis.length > 0">
+					<div
+						v-for="(recursosD, i) in recursosDisponiveis"
+						:key="recursosD"
+						class="flex items-center justify-start md:ms-96 lg:ms-4"
+					>
+						<UToggle
+							v-model="recursos[i]"
+							on-icon="i-heroicons-check-20-solid"
+							off-icon="i-heroicons-x-mark-20-solid"
+							color="green"
+						/>
+						<span class="ms-2">{{ recursosD }}</span>
+					</div>
 				</div>
-				<span v-else class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white"
-					>Nenhum recurso disponível neste auditório</span
-				>
+				<span v-else class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white">Nenhum recurso disponível neste auditório</span>
 			</div>
 			<div class="w-full col-span-1 sm:col-span-3">
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white"
 					for="descricao-solic"
-					>Descrição do Evento</label
-				>
+				>Descrição do Evento</label>
 				<UTextarea id="descricao-solic" v-model="descricao" autoresize />
 			</div>
 			<div class="w-full col-span-1 sm:col-span-3">
 				<label
 					class="block mb-2 text-sm font-medium text-gray-900 ms-1 dark:text-white"
 					for="observacao-solic"
-					>Observações</label
-				>
+				>Observações</label>
 				<UTextarea id="observacao-solic" v-model="observacao" autoresize />
 			</div>
 			<div class="flex items-center justify-center w-full col-span-1 sm:col-span-3">
@@ -651,8 +640,8 @@ const solicitar = () => {
 				icon="i-heroicons-check-circle"
 				label="Solicitar"
 				color="green"
-				@click="solicitar"
 				:loading="loading"
+				@click="solicitar"
 			/>
 		</div>
 	</UCard>

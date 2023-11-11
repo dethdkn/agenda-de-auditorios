@@ -1,7 +1,7 @@
-import type {Fields} from 'formidable'
+import type { Fields } from 'formidable'
 
 declare global {
 	type FormidableFields = Fields
 }
 
-export {FormidableFields}
+export { FormidableFields }

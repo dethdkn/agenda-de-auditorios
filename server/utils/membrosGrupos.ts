@@ -1,14 +1,11 @@
-import {ldapClient} from './ldapClient'
-import {Erro} from './mongoose'
-import limparMembros from './limparMembros'
-const {LDAP_GROUPS_DN} = useRuntimeConfig().public
+const { LDAP_GROUPS_DN } = useRuntimeConfig()
 
 export default (cn: string, ou: string): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
 		let members: string[] = []
 		ldapClient.search(
 			`cn=${cn}, ou=${ou}, ${LDAP_GROUPS_DN}`,
-			{attributes: ['member']},
+			{ attributes: ['member'] },
 			(err, res) => {
 				if (err) {
 					new Erro({
@@ -16,8 +13,8 @@ export default (cn: string, ou: string): Promise<string[]> => {
 							info: 'Erro na busca de membros de um grupo ldap',
 							cn,
 							ou,
-							err
-						}
+							err,
+						},
 					}).save()
 					return reject('Erro ao baixar membros dos grupos')
 				}
@@ -30,15 +27,15 @@ export default (cn: string, ou: string): Promise<string[]> => {
 							info: 'Erro na busca de membros de um grupo ldap',
 							cn,
 							ou,
-							error
-						}
+							error,
+						},
 					}).save()
 					return reject('Erro ao baixar membros dos grupos')
 				})
 				res.on('end', () => {
 					return resolve(limparMembros(members))
 				})
-			}
+			},
 		)
 	})
 }

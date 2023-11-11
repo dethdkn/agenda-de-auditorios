@@ -7,4 +7,4 @@ declare global {
 	}
 }
 
-export {UsuarioExterno}
+export { UsuarioExterno }
